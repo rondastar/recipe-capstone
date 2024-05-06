@@ -1,27 +1,44 @@
 const asyncHandler = require("express-async-handler");
 
+const Ingredient = require("../models/ingredientModel");
+
 // @desc   Get ingredients
 // @route GET /api/ingredients
 // @access ----------- TBD --------------
 const getIngredients = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: "Get ingredients" });
+  const ingredients = await Ingredient.find();
+  res.status(200).json(ingredients);
 });
 // @desc   Create ingredients
 // @route POST /api/ingredients
 // @access ----------- TBD --------------
-const createIngredient = asyncHandler(async (req, res) => {
+const addIngredient = asyncHandler(async (req, res) => {
   // if the request body text does not return OK
-  if (!req.body.text) {
+  if (!req.body.name) {
     res.status(400);
-    throw new Error("Please add a text field");
+    throw new Error("Please add a name field");
   }
-  res.status(200).json({ message: "Create ingredient" });
+  const ingredient = await Ingredient.create({
+    name: req.body.name,
+    gramsPerCup: req.body.gpc,
+  });
+  res.status(200).json(ingredient);
 });
 // @desc   Update ingredients
 // @route PUT /api/ingredients/:id
 // @access ----------- TBD --------------
 const updateIngredient = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: `Update ingredient ${req.params.id}` });
+  const ingredient = await Ingredient.findByID(req.params.id);
+  if (!ingredient) {
+    res.status(400);
+    throw new Error("Ingredient not found");
+  }
+  const updatedIngredient = await Ingredient.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.status(200).json(updatedIngredient);
 });
 // @desc   Delete ingredient
 // @route DELETE /api/ingredients/:id
@@ -32,7 +49,7 @@ const deleteIngredient = asyncHandler(async (req, res) => {
 
 module.exports = {
   getIngredients,
-  createIngredient,
+  addIngredient,
   updateIngredient,
   deleteIngredient,
 };

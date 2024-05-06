@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 const {
   getIngredients,
-  createIngredient,
+  addIngredient,
   updateIngredient,
   deleteIngredient,
 } = require("../controllers/ingredientController");
 
-router.route("/").get(getIngredients).post(createIngredient);
+router.route("/").get(getIngredients).post(addIngredient);
 // router.get("/", getIngredients);
 // router.post("/", createIngredient);
 
