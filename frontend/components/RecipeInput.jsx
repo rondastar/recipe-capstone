@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import ConvertedRecipeDisplay from "./ConvertedRecipeDisplay";
 
 function RecipeInput() {
   const ref = useRef(null);
@@ -15,30 +16,20 @@ function RecipeInput() {
     console.log(ingredientLines);
   };
   return (
-    // <div className="component-body">
-    //   <label htmlFor={recipeInput}>Original ingredient list:</label>
-    //   <textarea
-    //     id="recipe-input"
-    //     name="recipe-input"
-    //     value={recipeInput}
-    //     onChange={(e) => setRecipeInput(e.target.value)}
-    //     rows="20"
-    //     cols="50"
-    //     placeholder="Enter ingredient list here."
-    //   ></textarea>
-    //   {/* <button onClick={handleClick}>Convert Recipe</button> */}
-    // </div>
-    <div className="component-body">
-      <label htmlFor="recipeInput">Original ingredient list:</label>
-      <textarea
-        id="recipe-input"
-        name="recipe-input"
-        ref={ref}
-        rows="20"
-        cols="50"
-        placeholder="Enter ingredient list here."
-      ></textarea>
-      <button onClick={handleClick}>Convert Units</button>
+    <div>
+      <div className="card">
+        <label htmlFor="recipeInput">Original ingredient list:</label>
+        <textarea
+          id="recipe-input"
+          name="recipe-input"
+          ref={ref}
+          rows="20"
+          cols="50"
+          placeholder="Enter ingredient list here."
+        ></textarea>
+        <button onClick={handleClick}>Convert Units</button>
+      </div>
+      <ConvertedRecipeDisplay ingredientLines={ingredientLines} />
     </div>
   );
 }
