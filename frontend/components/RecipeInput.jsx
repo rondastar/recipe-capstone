@@ -1,22 +1,42 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext, createContext } from "react";
 import ConvertedRecipeDisplay from "./ConvertedRecipeDisplay";
 
 function RecipeInput() {
-  const ref = useRef(null);
+  const recipeContext = createContext(null);
+
+  // array of ingredient line objects including id, full line text, and text split by spaces
   const [ingredientLines, setIngredientLines] = useState([]);
+
+  // used to access the textarea value
+  const ref = useRef(null);
+
   const handleClick = (e) => {
-    // access textarea value
-    const recipeInput = ref.current.value;
+    const recipeInput = ref.current.value; // access textarea value
 
-    // split recipe input textarea by lines
-    const recipeInputLines = recipeInput.split("\n");
+    // split recipe input textarea by lines to separate ingredients
+    const recipeLines = recipeInput.split("\n");
 
-    // store the split recipe input lines in ingredientLines
-    setIngredientLines(recipeInputLines);
-    console.log(ingredientLines);
+    console.log(recipeLines); // continue working with recipeLines in this function
+
+    // Assign id to each recipeLine and convert to object
+    let uniqueId = 1000;
+    recipeLines.forEach((line) => {
+      let splitLine = line.split(" ");
+      let lineObject = {
+        id: uniqueId++,
+        text: line, // used to preserve original text for ingredients that are not converted
+        words: splitLine, // used to parse ingredients for unit and quantity conversion
+        quantity: null,
+        unit: null,
+        ingredient: null,
+      };
+      line = lineObject;
+      console.log(line);
+    });
+    setIngredientLines(recipeLines);
   };
   return (
-    <div>
+    <div className="card-container">
       <div className="card">
         <label htmlFor="recipeInput">Original ingredient list:</label>
         <textarea
@@ -29,7 +49,7 @@ function RecipeInput() {
         ></textarea>
         <button onClick={handleClick}>Convert Units</button>
       </div>
-      <ConvertedRecipeDisplay ingredientLines={ingredientLines} />
+      {/* <ConvertedRecipeDisplay ingredientLines={ingredientLines} /> */}
     </div>
   );
 }
