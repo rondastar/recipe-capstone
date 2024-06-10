@@ -9,6 +9,15 @@ const getIngredients = asyncHandler(async (req, res) => {
   const ingredients = await Ingredient.find();
   res.status(200).json(ingredients);
 });
+
+// @desc   Get ingredientby name
+// @route GET /api/ingredients/:name
+// @access ----------- TBD --------------
+const getIngredientByName = asyncHandler(async (req, res) => {
+  const ingredient = await Ingredient.find({ name: req.params.name });
+  res.status(200).json(ingredient);
+});
+
 // @desc   Create ingredients
 // @route POST /api/ingredients
 // @access ----------- TBD --------------
@@ -28,7 +37,7 @@ const addIngredient = asyncHandler(async (req, res) => {
 // @route PUT /api/ingredients/:id
 // @access ----------- TBD --------------
 const updateIngredient = asyncHandler(async (req, res) => {
-  const ingredient = await Ingredient.findByID(req.params.id);
+  const ingredient = await Ingredient.find({ id: req.params.id });
   if (!ingredient) {
     res.status(400);
     throw new Error("Ingredient not found");
@@ -49,6 +58,7 @@ const deleteIngredient = asyncHandler(async (req, res) => {
 
 module.exports = {
   getIngredients,
+  getIngredientByName,
   addIngredient,
   updateIngredient,
   deleteIngredient,

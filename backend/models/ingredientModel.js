@@ -12,7 +12,7 @@ const ingredientSchema = mongoose.Schema(
     },
   },
   {
-    timestamps: true,
+    timestamps: Date.now,
   }
 );
 
