@@ -34,6 +34,7 @@ function RecipeInput() {
           unit: null, // assigned as ingredient line is parsed, if applicable
           unitScale: null,
           ingredient: null, // assigned after ingredient line is parsed
+          unitsPerCup: null, // number of units per cup; used to convert from to grams
           gramsPerCup: null,
         };
         line = lineObject;
@@ -47,8 +48,36 @@ function RecipeInput() {
             line.qtyType = "mixed";
             line.qtyNumerator = fraction[0];
             line.qtyDenominator = fraction[1];
-            // -----!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! assume the following word is unit ---- actually don't assume!! could be a qty without unit
-            line.unit = line.words[2];
+            // parse unit and update corresponding properties
+            if (
+              line.words[2] === "T" ||
+              ["tbsp", "tablespoon", "tablespoons"].includes(
+                line.words[2].toLowerCase()
+              )
+            ) {
+              line.unit = "tablespoon";
+              line.unitsPerCup = 16;
+              line.unitScale = "US";
+            } else if (
+              ["t", "tsp", "teaspoon", "teaspoons"].includes(
+                line.words[2].toLowerCase()
+              )
+            ) {
+              line.unit = "teaspoon";
+              line.unitsPerCup = 48.7;
+              line.unitScale = "US";
+            } else if (
+              ["c", "cup", "cups"].includes(line.words[2].toLowerCase())
+            ) {
+              line.unit = "cup";
+              line.unitsPerCup = 1;
+              line.unitScale = "US";
+            } else if (
+              ["g", "gram", "grams"].includes(line.words[2].toLowerCase())
+            ) {
+              line.unit = "gram";
+              line.unitScale = "metric";
+            }
           } else {
             // make the quantity type whole if it is a number not followed by a fraction
             // this could also include decimals; not relevant since it does not affect calculations

@@ -1,3 +1,22 @@
+### Date: June 9, 2024
+
+#### New Features
+
+- API functionality to get ingredient data by ingredient name from MongoDB
+- Ingredient lines parsed into quantity and unit
+- Unit equivalencies added to calculate between US measurement units, such as teaspoon and cup
+- Basic styling added to improve UX
+
+#### Issues Encountered
+
+- Connecting the data in MongoDB with the calculations in the frontend of my app is my current challenge. Ideally, I would like to import only the densities of the ingredients that are actually being converted and not all of the ingredients in the database. That is what I will work on next.
+
+#### Lessons Learned
+
+- Some of the specific methods and nuances of JavaScript are becoming more familiar to me, such as the 'includes' method which can check whether an array contains a given string.
+- There's a math.js extension library! I want to play around with it and use it to streamline quantity calculations, but for this version the calculations will be built out in the app.
+- I'm getting more comfortable using JSON!
+
 ### Date: May 31, 2024
 
 #### New Features
