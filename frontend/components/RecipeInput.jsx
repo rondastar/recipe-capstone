@@ -1,9 +1,8 @@
-import { useState, useRef, useContext, createContext } from "react";
+import { useState, useRef, useEffect } from "react";
+import axios from "axios";
 import ConvertedRecipeDisplay from "./ConvertedRecipeDisplay";
 
 function RecipeInput() {
-  const recipeContext = createContext(null);
-
   // array of ingredient line objects including id, full line text, and text split by spaces
   const [ingredientLines, setIngredientLines] = useState([]);
   const [ingredientData, setIngredientData] = useState([]);
@@ -34,14 +33,17 @@ function RecipeInput() {
           unit: null, // assigned as ingredient line is parsed, if applicable
           unitScale: null,
           ingredient: null, // assigned after ingredient line is parsed
+          ingredientSearchTerm: null, // used to query ingredient in mongodb
           unitsPerCup: null, // number of units per cup; used to convert from to grams
           gramsPerCup: null,
+          parsedToIndex: null, // tracks the last parsed index before ingredient
+          data: null,
         };
         line = lineObject;
         // if the first word is a number assign it to  the whole number quantity
         if (!isNaN(line.words[0])) {
           line.qtyWholeNum = line.words[0];
-          // if the second word is a fraction
+          line.parsedToIndex = 0;
           // the quantity is a mixed number including whole number and fraction
           if (line.words[1].includes("/")) {
             let fraction = line.words[1].split("/");
@@ -49,6 +51,7 @@ function RecipeInput() {
             line.qtyNumerator = fraction[0];
             line.qtyDenominator = fraction[1];
             // parse unit and update corresponding properties
+            line.parsedToIndex = 0;
             if (
               line.words[2] === "T" ||
               ["tbsp", "tablespoon", "tablespoons"].includes(
@@ -58,6 +61,7 @@ function RecipeInput() {
               line.unit = "tablespoon";
               line.unitsPerCup = 16;
               line.unitScale = "US";
+              line.parsedToIndex = 2;
             } else if (
               ["t", "tsp", "teaspoon", "teaspoons"].includes(
                 line.words[2].toLowerCase()
@@ -66,24 +70,60 @@ function RecipeInput() {
               line.unit = "teaspoon";
               line.unitsPerCup = 48.7;
               line.unitScale = "US";
+              line.parsedToIndex = 2;
             } else if (
               ["c", "cup", "cups"].includes(line.words[2].toLowerCase())
             ) {
               line.unit = "cup";
               line.unitsPerCup = 1;
               line.unitScale = "US";
+              line.parsedToIndex = 2;
             } else if (
               ["g", "gram", "grams"].includes(line.words[2].toLowerCase())
             ) {
               line.unit = "gram";
               line.unitScale = "metric";
+              line.parsedToIndex = 2;
             }
           } else {
             // make the quantity type whole if it is a number not followed by a fraction
             // this could also include decimals; not relevant since it does not affect calculations
             line.qtyType = "whole";
-            // assume the following word is unit
-            line.unit = line.words[1];
+            line.parsedToIndex = 0;
+            // parse the next word to determine unit
+            if (
+              line.words[1] === "T" ||
+              ["tbsp", "tablespoon", "tablespoons"].includes(
+                line.words[1].toLowerCase()
+              )
+            ) {
+              line.unit = "tablespoon";
+              line.unitsPerCup = 16;
+              line.unitScale = "US";
+              line.parsedToIndex = 1;
+            } else if (
+              ["t", "tsp", "teaspoon", "teaspoons"].includes(
+                line.words[1].toLowerCase()
+              )
+            ) {
+              line.unit = "teaspoon";
+              line.unitsPerCup = 48.7;
+              line.unitScale = "US";
+              line.parsedToIndex = 1;
+            } else if (
+              ["c", "cup", "cups"].includes(line.words[1].toLowerCase())
+            ) {
+              line.unit = "cup";
+              line.unitsPerCup = 1;
+              line.unitScale = "US";
+              line.parsedToIndex = 1;
+            } else if (
+              ["g", "gram", "grams"].includes(line.words[1].toLowerCase())
+            ) {
+              line.unit = "gram";
+              line.unitScale = "metric";
+              line.parsedToIndex = 1;
+            }
           }
         } else if (line.words[0].includes("/")) {
           // The first word is a fraction, so the quantity type is a fraction
@@ -91,14 +131,65 @@ function RecipeInput() {
           line.qtyType = "fraction";
           line.qtyNumerator = fraction[0];
           line.qtyDenominator = fraction[1];
+          line.parsedToIndex = 0;
+          if (
+            line.words[1] === "T" ||
+            ["tbsp", "tablespoon", "tablespoons"].includes(
+              line.words[1].toLowerCase()
+            )
+          ) {
+            line.unit = "tablespoon";
+            line.unitsPerCup = 16;
+            line.unitScale = "US";
+            line.parsedToIndex = 1;
+          } else if (
+            ["t", "tsp", "teaspoon", "teaspoons"].includes(
+              line.words[1].toLowerCase()
+            )
+          ) {
+            line.unit = "teaspoon";
+            line.unitsPerCup = 48.7;
+            line.unitScale = "US";
+            line.parsedToIndex = 1;
+          } else if (
+            ["c", "cup", "cups"].includes(line.words[1].toLowerCase())
+          ) {
+            line.unit = "cup";
+            line.unitsPerCup = 1;
+            line.unitScale = "US";
+            line.parsedToIndex = 1;
+          } else if (
+            ["g", "gram", "grams"].includes(line.words[1].toLowerCase())
+          ) {
+            line.unit = "gram";
+            line.unitScale = "metric";
+            line.parsedToIndex = 1;
+          }
         } else {
           // The first word is NOT a number
           line.qtyType = "NaN";
         }
+        // parse ingredient if unit or quantity has been parsed
+        if (line.parsedToIndex !== null) {
+          let ingredient = "";
+          let ingredientSearchTerm = "";
+          for (let i = line.parsedToIndex + 1; i < line.words.length; i++) {
+            if (i + 1 < line.words.length) {
+              ingredient += `${line.words[i]} `;
+              ingredientSearchTerm += `${line.words[i]}%20`;
+            } else {
+              ingredient += line.words[i];
+              ingredientSearchTerm += line.words[i];
+            }
+          }
+          line.ingredient = ingredient;
+          line.ingredientSearchTerm = ingredientSearchTerm;
+        }
       }
       console.log(line);
     });
-    // setIngredientLines(recipeLines);
+
+    setIngredientLines(recipeLines);
     // parseIngredientLine(recipeLines);
   };
 
@@ -116,7 +207,7 @@ function RecipeInput() {
         ></textarea>
         <button onClick={handleClick}>Convert Units</button>
       </div>
-      {/* <ConvertedRecipeDisplay ingredientLines={ingredientLines} /> */}
+      <ConvertedRecipeDisplay ingredientLines={ingredientLines} />
     </div>
   );
 }

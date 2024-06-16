@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 
 const Ingredient = require("../models/ingredientModel");
 
-// @desc   Get ingredients
+// @desc   Get all ingredients
 // @route GET /api/ingredients
 // @access ----------- TBD --------------
 const getIngredients = asyncHandler(async (req, res) => {
@@ -10,12 +10,22 @@ const getIngredients = asyncHandler(async (req, res) => {
   res.status(200).json(ingredients);
 });
 
-// @desc   Get ingredientby name
+// @desc   Get ingredient by name
 // @route GET /api/ingredients/:name
 // @access ----------- TBD --------------
 const getIngredientByName = asyncHandler(async (req, res) => {
   const ingredient = await Ingredient.find({ name: req.params.name });
   res.status(200).json(ingredient);
+});
+
+// @desc   Get ingredient grams per cup by name
+// @route GET /api/ingredients/gpc/:name
+// @access ----------- TBD --------------
+const getIngredientGPCByName = asyncHandler(async (req, res) => {
+  const ingredientGPC = await Ingredient.findOne({
+    name: req.params.name,
+  }).select("name gramsPerCup");
+  res.status(200).json(ingredientGPC);
 });
 
 // @desc   Create ingredients
@@ -59,6 +69,7 @@ const deleteIngredient = asyncHandler(async (req, res) => {
 module.exports = {
   getIngredients,
   getIngredientByName,
+  getIngredientGPCByName,
   addIngredient,
   updateIngredient,
   deleteIngredient,
