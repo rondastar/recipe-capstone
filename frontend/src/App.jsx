@@ -1,11 +1,11 @@
 import "./App.css";
-import RecipeInput from "../components/RecipeInput";
+import RecipeConverter from "../components/RecipeConverter";
 
 function App() {
   return (
     <>
-      <div recipe-converter-container>
-        <RecipeInput />
+      <div className="app-body">
+        <RecipeConverter />
       </div>
     </>
   );
