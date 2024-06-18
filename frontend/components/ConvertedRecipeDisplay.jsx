@@ -65,14 +65,18 @@ function ConvertedRecipeDisplay({ parsedIngredientLines, isParsingComplete }) {
   };
 
   return (
-    <div className="card-container">
-      <h2>Converted ingredient list:</h2>
-      <div className="card">
-        {convertedLines.map((line) => (
-          <div key={line.id} style={{ color: `${line.color}` }}>
-            <p className="line-display">{line.display}</p>
-          </div>
-        ))}
+    <div>
+      <div className="split-card-body">
+        <h3 className="subtitle">Converted ingredient list:</h3>
+        <div className="display">
+          {convertedLines.map((line) => (
+            <div key={line.id}>
+              <p style={{ color: `${line.color}` }} className="line-display">
+                {line.display}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

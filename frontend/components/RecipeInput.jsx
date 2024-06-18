@@ -278,9 +278,10 @@ function RecipeInput({
   // }, [ingredientsWithGPCData, isFetchingGPCComplete === true]);
 
   return (
-    <div className="card-container">
-      <div className="card">
-        <label htmlFor="recipeInput">Original ingredient list:</label>
+    <div>
+      <div className="split-card-body">
+        <h3 className="subtitle">Original ingredient list:</h3>
+        <label htmlFor="recipeInput"></label>
         <textarea
           id="recipe-input"
           name="recipe-input"
@@ -289,7 +290,7 @@ function RecipeInput({
           cols="50"
           placeholder="Enter ingredient list here."
         ></textarea>
-        <button onClick={handleClick}>Convert Units</button>
+        <button onClick={handleClick}>Convert to Grams</button>
       </div>
     </div>
   );
